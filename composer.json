@@ -1,0 +1,7 @@
+{
+    "require": {
+        "tymon/jwt-auth": "^2.3",
+        "intervention/image": "^4.1",
+        "stripe/stripe-php": "^20.2"
+    }
+}
