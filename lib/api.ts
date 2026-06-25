@@ -18,7 +18,6 @@ async function apiRequest<T>(endpoint: string, options: RequestInit = {}): Promi
     const response = await fetch(`${API_URL}${endpoint}`, { ...options, headers });
     let text = await response.text();
 
-    // Supprimer le BOM si présent
     if (text.charCodeAt(0) === 0xFEFF) {
       text = text.slice(1);
     }
@@ -70,12 +69,13 @@ export const authAPI = {
 };
 
 // ============================================
-// PRODUITS
+// PRODUITS PUBLICS
 // ============================================
 export const productsAPI = {
   getAll: (params?: any) => {
     const query = new URLSearchParams();
     if (params?.page) query.append('page', params.page.toString());
+    if (params?.search) query.append('search', params.search);
     return apiRequest(`/products?${query.toString()}`);
   },
   getBySlug: (slug: string) => apiRequest(`/products/${slug}`),
@@ -110,23 +110,18 @@ export const addressesAPI = {
   getAll: () => apiRequest('/addresses'),
   create: (data: any) => apiRequest('/addresses', { method: 'POST', body: JSON.stringify(data) }),
   setDefault: (id: number) => apiRequest(`/addresses/${id}/set-default`, { method: 'POST' }),
+  update: (id: number, data: any) => apiRequest(`/addresses/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
+  delete: (id: number) => apiRequest(`/addresses/${id}`, { method: 'DELETE' }),
 };
 
 // ============================================
-// COMMANDES
+// COMMANDES UTILISATEUR
 // ============================================
 export const ordersAPI = {
   getAll: () => apiRequest('/orders'),
+  getByNumero: (numero: string) => apiRequest(`/orders/${numero}`),
   create: (data: any) => apiRequest('/orders', { method: 'POST', body: JSON.stringify(data) }),
-};
-
-// ============================================
-// PAIEMENT GÉNÉRIQUE
-// ============================================
-export const paymentAPI = {
-  initiate: (numeroCommande: string) => apiRequest(`/payment/initiate/${numeroCommande}`),
-  process: (numeroCommande: string, data: any) =>
-    apiRequest(`/payment/process/${numeroCommande}`, { method: 'POST', body: JSON.stringify(data) }),
+  cancel: (numero: string) => apiRequest(`/orders/${numero}/cancel`, { method: 'POST' }),
 };
 
 // ============================================
@@ -192,7 +187,7 @@ export const stockAPI = {
 };
 
 // ============================================
-// MAISHAPAY (DÉFINI UNE SEULE FOIS)
+// MAISHAPAY
 // ============================================
 export const maishapayAPI = {
   initier: (numeroCommande: string) =>
@@ -202,7 +197,7 @@ export const maishapayAPI = {
 };
 
 // ============================================
-// ADMIN
+// ADMIN - AVEC TOUTES LES MÉTHODES
 // ============================================
 export const adminAPI = {
   dashboard: () => apiRequest('/admin/dashboard'),
@@ -214,18 +209,22 @@ export const adminAPI = {
   products: {
     getAll: () => apiRequest('/admin/products'),
     create: (data: any) => apiRequest('/admin/products', { method: 'POST', body: JSON.stringify(data) }),
+    update: (id: number, data: any) => apiRequest(`/admin/products/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
     delete: (id: number) => apiRequest(`/admin/products/${id}`, { method: 'DELETE' }),
+    uploadImage: (file: File) => uploadAPI.uploadImage(file),
   },
 
   categories: {
     getAll: () => apiRequest('/admin/categories'),
     create: (data: any) => apiRequest('/admin/categories', { method: 'POST', body: JSON.stringify(data) }),
+    update: (id: number, data: any) => apiRequest(`/admin/categories/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
     delete: (id: number) => apiRequest(`/admin/categories/${id}`, { method: 'DELETE' }),
   },
 
   brands: {
     getAll: () => apiRequest('/admin/brands'),
     create: (data: any) => apiRequest('/admin/brands', { method: 'POST', body: JSON.stringify(data) }),
+    update: (id: number, data: any) => apiRequest(`/admin/brands/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
     delete: (id: number) => apiRequest(`/admin/brands/${id}`, { method: 'DELETE' }),
   },
 
@@ -240,6 +239,8 @@ export const adminAPI = {
     get: (numero: string) => apiRequest(`/admin/orders/${numero}`),
     changeStatus: (id: number, statut: string) =>
       apiRequest(`/admin/orders/${id}/change-status`, { method: 'POST', body: JSON.stringify({ statut }) }),
+    addNote: (id: number, note: string) =>
+      apiRequest(`/admin/orders/${id}/add-note`, { method: 'POST', body: JSON.stringify({ note }) }),
   },
 
   users: {
@@ -257,8 +258,10 @@ export const adminAPI = {
 
   tauxChange: {
     getActif: () => apiRequest('/admin/taux-change/actif'),
+    getAll: () => apiRequest('/admin/taux-change'),
     update: (taux: number, note?: string) =>
       apiRequest('/admin/taux-change', { method: 'POST', body: JSON.stringify({ taux, note }) }),
+    history: () => apiRequest('/admin/taux-change/history'),
   },
 
   security: {
@@ -266,8 +269,12 @@ export const adminAPI = {
     blockIP: (ip: string, reason: string, duration: number) =>
       apiRequest('/admin/security/block-ip', { method: 'POST', body: JSON.stringify({ ip, reason, duration }) }),
     unblockIP: (ip: string) => apiRequest(`/admin/security/unblock-ip/${ip}`, { method: 'DELETE' }),
+    cleanLogs: () => apiRequest('/admin/security/clean-logs', { method: 'POST' }),
   },
 
+  // ============================================
+  // REVIEWS - AVEC TOUTES LES MÉTHODES (CORRECTION ICI)
+  // ============================================
   reviews: {
     getAll: (params?: any) => {
       const query = new URLSearchParams();
@@ -279,9 +286,17 @@ export const adminAPI = {
     approuver: (id: number) => apiRequest(`/admin/reviews/${id}/approuver`, { method: 'POST' }),
     desapprouver: (id: number) => apiRequest(`/admin/reviews/${id}/desapprouver`, { method: 'POST' }),
     delete: (id: number) => apiRequest(`/admin/reviews/${id}`, { method: 'DELETE' }),
+    // MÉTHODES MANQUANTES AJOUTÉES :
+    getSignalements: () => apiRequest('/admin/reviews/signalements'),
+    traiterSignalement: (id: number) => apiRequest(`/admin/reviews/signalements/${id}/traiter`, { method: 'POST' }),
+    repondre: (avisId: number, contenu: string) =>
+      apiRequest(`/admin/reviews/${avisId}/repondre`, { method: 'POST', body: JSON.stringify({ contenu }) }),
   },
 };
 
+// ============================================
+// ADMIN REGISTRATION
+// ============================================
 export const adminRegistrationAPI = {
   check: () => apiRequest('/admin-registration/check'),
   register: (data: any) => apiRequest('/admin-registration/register', { method: 'POST', body: JSON.stringify(data) }),
