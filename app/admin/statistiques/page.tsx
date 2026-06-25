@@ -82,7 +82,7 @@ export default function StatistiquesPage() {
             Tableau de bord analytique
           </h1>
           <p className="text-gray-600 dark:text-gray-400 mt-1">
-            Vue d'ensemble de votre activité e-commerce
+            Vue d'ensemble de votre activitÃ© e-commerce
           </p>
         </div>
         <div className="flex gap-2">
@@ -134,7 +134,7 @@ export default function StatistiquesPage() {
         {/* Revenus par mois */}
         <Card className="p-6">
           <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100 mb-4">
-            Évolution des revenus
+            Ã‰volution des revenus
           </h3>
           <ResponsiveContainer width="100%" height={300}>
             <AreaChart data={stats.revenus_par_mois}>
@@ -154,7 +154,7 @@ export default function StatistiquesPage() {
                   borderRadius: '8px',
                   color: '#fff'
                 }}
-                formatter={(value: number) => formatPrice(value)}
+                formatter={(value) => formatPrice(Number(value))}
               />
               <Area type="monotone" dataKey="total" stroke="#6366f1" fillOpacity={1} fill="url(#colorRevenu)" />
             </AreaChart>
@@ -184,10 +184,10 @@ export default function StatistiquesPage() {
           </ResponsiveContainer>
         </Card>
 
-        {/* Ventes par catégorie */}
+        {/* Ventes par catÃ©gorie */}
         <Card className="p-6">
           <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100 mb-4">
-            Ventes par catégorie
+            Ventes par catÃ©gorie
           </h3>
           {stats.ventes_par_categorie && stats.ventes_par_categorie.length > 0 ? (
             <ResponsiveContainer width="100%" height={300}>
@@ -213,13 +213,13 @@ export default function StatistiquesPage() {
                     borderRadius: '8px',
                     color: '#fff'
                   }}
-                  formatter={(value: number) => formatPrice(value)}
+                  formatter={(value) => formatPrice(Number(value))}
                 />
               </PieChart>
             </ResponsiveContainer>
           ) : (
             <div className="flex items-center justify-center h-[300px] text-gray-500">
-              Aucune donnée disponible
+              Aucune donnÃ©e disponible
             </div>
           )}
         </Card>
@@ -254,7 +254,7 @@ export default function StatistiquesPage() {
         </Card>
       </div>
 
-      {/* Top produits et Méthodes de paiement */}
+      {/* Top produits et MÃ©thodes de paiement */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Top 10 produits */}
         <Card className="p-6">
@@ -279,7 +279,7 @@ export default function StatistiquesPage() {
                     </p>
                     <div className="flex items-center gap-2 text-xs text-gray-500">
                       <span>{produit.total_vendu} vendus</span>
-                      <span>•</span>
+                      <span>â€¢</span>
                       <span>{formatPrice(produit.revenu_total)}</span>
                     </div>
                   </div>
@@ -294,15 +294,15 @@ export default function StatistiquesPage() {
             </div>
           ) : (
             <div className="flex items-center justify-center h-[300px] text-gray-500">
-              Aucune vente enregistrée
+              Aucune vente enregistrÃ©e
             </div>
           )}
         </Card>
 
-        {/* Méthodes de paiement */}
+        {/* MÃ©thodes de paiement */}
         <Card className="p-6">
           <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100 mb-4">
-            Méthodes de paiement
+            MÃ©thodes de paiement
           </h3>
           {stats.methodes_paiement && stats.methodes_paiement.length > 0 ? (
             <ResponsiveContainer width="100%" height={300}>
@@ -327,25 +327,25 @@ export default function StatistiquesPage() {
                     borderRadius: '8px',
                     color: '#fff'
                   }}
-                  formatter={(value: number) => formatPrice(value)}
+                  formatter={(value) => formatPrice(Number(value))}
                 />
               </PieChart>
             </ResponsiveContainer>
           ) : (
             <div className="flex items-center justify-center h-[300px] text-gray-500">
-              Aucune donnée disponible
+              Aucune donnÃ©e disponible
             </div>
           )}
         </Card>
       </div>
 
-      {/* Statistiques supplémentaires */}
+      {/* Statistiques supplÃ©mentaires */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <Card className="p-6">
           <h4 className="font-semibold text-gray-900 dark:text-gray-100 mb-3">Commandes</h4>
           <div className="space-y-2">
             <div className="flex justify-between text-sm">
-              <span className="text-gray-600 dark:text-gray-400">Payées</span>
+              <span className="text-gray-600 dark:text-gray-400">PayÃ©es</span>
               <span className="font-semibold text-green-600">{g.commandes_payees}</span>
             </div>
             <div className="flex justify-between text-sm">
@@ -353,7 +353,7 @@ export default function StatistiquesPage() {
               <span className="font-semibold text-amber-600">{g.commandes_en_attente}</span>
             </div>
             <div className="flex justify-between text-sm">
-              <span className="text-gray-600 dark:text-gray-400">Livrées</span>
+              <span className="text-gray-600 dark:text-gray-400">LivrÃ©es</span>
               <span className="font-semibold text-blue-600">{g.commandes_livrees}</span>
             </div>
           </div>
